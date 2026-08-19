@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clock Quest</title>
+<meta name="description" content="A step-by-step game that teaches kids to read an analog clock, using colored hour stripes and a minute ring.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF6E9;
+  --bg2:#FFE9CC;
+  --card:#FFFFFF;
+  --ink:#33303C;
+  --ink-soft:#6B6577;
+  --line:#E6DCCB;
+  --blue:#2E5AAC;
+  --blue-soft:#E8EFFB;
+  --orange:#FF7A45;
+  --green:#1F9D55;
+  --green-soft:#E3F7EA;
+  --red:#D6455C;
+  --red-soft:#FDE8EC;
+  --gold:#F0A500;
+  --shadow:0 6px 0 rgba(0,0,0,.08), 0 12px 28px rgba(60,40,10,.12);
+  --shadow-sm:0 3px 0 rgba(0,0,0,.07), 0 6px 16px rgba(60,40,10,.10);
+  --radius:22px;
+  --font:"Nunito", ui-rounded, "Hiragino Maru Gothic ProN", "Segoe UI Rounded", "Varela Round", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--font);
+  background:
+    radial-gradient(900px 520px at 12% -8%, #FFFFFF 0%, rgba(255,255,255,0) 62%),
+    radial-gradient(760px 460px at 106% 4%, #FFE0C2 0%, rgba(255,224,194,0) 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+  background-attachment:fixed;
+  color:var(--ink);
+  -webkit-text-size-adjust:100%;
+  min-height:100vh;
+  font-weight:700;
+}
+
+/* ---------- shell ---------- */
+.wrap{max-width:1080px;margin:0 auto;padding:14px 16px 60px}
+header.topbar{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:10px 14px;margin-bottom:14px;
+  background:rgba(255,255,255,.82);
+  border:3px solid #fff;border-radius:20px;box-shadow:var(--shadow-sm);
+  backdrop-filter:blur(6px);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:1.25rem;letter-spacing:-.02em}
+.brand .logo{font-size:1.6rem;line-height:1}
+.spacer{flex:1 1 auto}
+.starcount{
+  display:inline-flex;align-items:center;gap:6px;
+  background:#FFF3D0;border:2px solid #F6DFA0;color:#8A6300;
+  padding:5px 12px;border-radius:999px;font-weight:900;font-size:.95rem;
+}
+
+/* ---------- buttons ---------- */
+button{font-family:inherit}
+.btn{
+  appearance:none;border:none;cursor:pointer;
+  background:var(--blue);color:#fff;
+  font-weight:900;font-size:1.02rem;
+  padding:13px 22px;border-radius:16px;
+  box-shadow:0 4px 0 #1E3F7E;
+  transition:transform .08s ease, box-shadow .08s ease, background .15s ease;
+  line-height:1.15;
+}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1E3F7E}
+.btn:focus-visible{outline:4px solid #111;outline-offset:3px}
+.btn.ghost{background:#fff;color:var(--blue);box-shadow:0 4px 0 #D8D2C6;border:2px solid #EFE7D8}
+.btn.ghost:active{box-shadow:0 1px 0 #D8D2C6}
+.btn.go{background:var(--green);box-shadow:0 4px 0 #146B3A}
+.btn.go:active{box-shadow:0 1px 0 #146B3A}
+.btn.warm{background:var(--orange);box-shadow:0 4px 0 #C2512A}
+.btn.warm:active{box-shadow:0 1px 0 #C2512A}
+.btn.small{padding:9px 15px;font-size:.92rem;border-radius:13px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* ---------- screens ---------- */
+.screen{display:none;animation:fadeUp .28s ease both}
+.screen.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.hero{
+  background:var(--card);border:3px solid #fff;border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px 22px 24px;margin-bottom:18px;text-align:center;
+}
+.hero h1{margin:.1em 0 .25em;font-size:clamp(1.7rem,5vw,2.5rem);font-weight:900;letter-spacing:-.03em}
+.hero p{margin:0 auto;max-width:56ch;color:var(--ink-soft);font-weight:700;font-size:1.02rem;line-height:1.5}
+
+.lesson-grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.lesson-card{
+  position:relative;text-align:left;
+  background:var(--card);border:3px solid #fff;border-radius:20px;
+  box-shadow:var(--shadow-sm);padding:16px 16px 14px;cursor:pointer;
+  display:flex;gap:12px;align-items:flex-start;width:100%;
+  transition:transform .12s ease, box-shadow .12s ease;
+}
+.lesson-card:hover:not(.locked){transform:translateY(-3px);box-shadow:var(--shadow)}
+.lesson-card:focus-visible{outline:4px solid #111;outline-offset:3px}
+.lesson-card.locked{cursor:not-allowed;opacity:.62;filter:grayscale(.5)}
+.lesson-card .lemoji{font-size:2rem;line-height:1;flex:0 0 auto}
+.lesson-card h3{margin:0 0 3px;font-size:1.06rem;font-weight:900;letter-spacing:-.02em}
+.lesson-card p{margin:0;font-size:.88rem;color:var(--ink-soft);font-weight:700;line-height:1.4}
+.lesson-card .step-no{
+  position:absolute;top:-10px;left:-10px;background:var(--blue);color:#fff;
+  width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  font-weight:900;font-size:.9rem;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.15)
+}
+.lesson-card.locked .step-no{background:#B4AFA4}
+.stars{margin-top:8px;font-size:1rem;letter-spacing:2px;color:var(--gold)}
+.stars .off{opacity:.25;filter:grayscale(1)}
+
+/* ---------- play layout ---------- */
+.play{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:900px){.play{grid-template-columns:minmax(340px,460px) minmax(0,1fr);align-items:start}}
+
+.panel{
+  background:var(--card);border:3px solid #fff;border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:18px;
+}
+.clockbox{
+  background:var(--card);border:3px solid #fff;border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:14px 14px 16px;position:sticky;top:12px;
+}
+@media(max-width:899px){.clockbox{position:static}}
+
+/* ---------- clock ---------- */
+.clock-shell{position:relative;width:100%;max-width:430px;margin:0 auto;aspect-ratio:1/1}
+svg.clock{width:100%;height:100%;display:block;touch-action:none;-webkit-user-select:none;user-select:none;cursor:pointer}
+svg.clock:focus-visible{outline:4px solid #111;outline-offset:2px;border-radius:50%}
+.zone{stroke:#fff;stroke-width:1.6;transition:opacity .3s ease, filter .3s ease}
+.zone.dim{opacity:.16}
+.zone.flash{animation:zoneFlash 1.05s ease 2}
+@keyframes zoneFlash{0%,100%{filter:none}45%{filter:brightness(1.16) saturate(1.5) drop-shadow(0 0 9px rgba(0,0,0,.28))}}
+.zonelabel{font-weight:900;font-size:25px;fill:#3B3243;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.zonelabel.small{font-size:19px}
+.minblock{transition:opacity .3s ease}
+.mintick{stroke:#8C8598;stroke-width:1.6;stroke-linecap:round}
+.mintick.major{stroke:#4C4657;stroke-width:3.4}
+.minlabel{font-weight:900;font-size:15px;fill:#4C4657;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.minlabel.tiny{font-size:9px;fill:#7E7789;font-weight:700}
+#minuteRing.flash{animation:ringFlash 1.05s ease 2}
+@keyframes ringFlash{0%,100%{filter:none}45%{filter:brightness(1.1) saturate(1.6) drop-shadow(0 0 9px rgba(0,0,0,.3))}}
+.hand{cursor:grab}
+.hand.grabbing{cursor:grabbing}
+.hand-hour{fill:#2F3A56;stroke:#fff;stroke-width:2.5;stroke-linejoin:round}
+.hand-min{fill:#D6455C;stroke:#fff;stroke-width:2.5;stroke-linejoin:round}
+.hand.sel .hand-hour,.hand.sel .hand-min{stroke:#111;stroke-width:3.4}
+.handtag{font-size:11.5px;font-weight:900;fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.face-ring{fill:none;stroke:#EFE7D8;stroke-width:3}
+.hub{fill:#2F3A56;stroke:#fff;stroke-width:3}
+
+/* ---------- readout ---------- */
+.readout{margin-top:10px;text-align:center}
+.readout{min-height:74px}
+.digital{
+  display:inline-block;background:#2F3A56;color:#8CF5C6;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-weight:700;font-size:1.75rem;letter-spacing:.06em;
+  padding:6px 18px;border-radius:14px;box-shadow:inset 0 2px 8px rgba(0,0,0,.4)
+}
+.inwords{margin-top:7px;font-size:1.06rem;font-weight:900;color:var(--blue)}
+
+.handpicker{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px}
+.chip{
+  appearance:none;cursor:pointer;font-weight:900;font-size:.9rem;
+  border:2px solid var(--line);background:#fff;color:var(--ink-soft);
+  padding:8px 14px;border-radius:999px;display:inline-flex;align-items:center;gap:7px;
+}
+.chip .dot{width:13px;height:13px;border-radius:50%;display:inline-block}
+.chip[aria-pressed="true"]{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.chip:focus-visible{outline:3px solid #111;outline-offset:2px}
+.nudge{display:flex;gap:8px;justify-content:center;margin-top:9px;flex-wrap:wrap}
+.hintline{margin-top:8px;text-align:center;font-size:.82rem;color:var(--ink-soft);font-weight:700}
+
+/* ---------- task panel ---------- */
+.crumbs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.crumb{
+  font-size:.76rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em;
+  padding:5px 11px;border-radius:999px;background:#F1ECE2;color:#8A8298;
+}
+.crumb.on{background:var(--blue);color:#fff}
+.crumb.done{background:var(--green-soft);color:var(--green)}
+.progress{height:12px;background:#F1ECE2;border-radius:999px;overflow:hidden;margin-bottom:16px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,#4C86E8,#2E5AAC);border-radius:999px;transition:width .35s ease}
+
+.task h2{margin:0 0 6px;font-size:1.35rem;font-weight:900;letter-spacing:-.02em}
+.task .sub{margin:0 0 14px;color:var(--ink-soft);font-weight:700;line-height:1.5}
+.bigtime{
+  display:inline-block;background:var(--blue-soft);border:3px dashed #A9C3EE;color:var(--blue);
+  padding:10px 20px;border-radius:16px;font-size:1.7rem;font-weight:900;margin:2px 0 6px;
+}
+.bigtime .words{display:block;font-size:.95rem;font-weight:800;color:#4A6FB5;margin-top:2px}
+
+.answer-block{margin-top:6px}
+.answer-block h4{
+  margin:14px 0 8px;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--ink-soft);font-weight:900;
+}
+.hourgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+@media(max-width:420px){.hourgrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.mingrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media(max-width:520px){.mingrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.opt{
+  appearance:none;cursor:pointer;background:#fff;border:2.5px solid var(--line);
+  color:var(--ink);font-weight:900;font-size:1.02rem;padding:12px 6px;border-radius:14px;
+  transition:transform .08s ease, border-color .12s, background .12s;
+  display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.15;
+}
+.opt small{font-weight:800;font-size:.68rem;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em}
+.opt:hover{border-color:#BBB3A4}
+.opt:active{transform:translateY(2px)}
+.opt[aria-pressed="true"]{background:var(--blue);border-color:var(--blue);color:#fff}
+.opt[aria-pressed="true"] small{color:#D6E3FA}
+.opt:focus-visible{outline:3px solid #111;outline-offset:2px}
+.opt.hz{border-bottom-width:7px}
+
+.spinner{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.spinner .val{
+  min-width:104px;text-align:center;background:#2F3A56;color:#8CF5C6;border-radius:14px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:1.6rem;font-weight:700;padding:8px 10px;
+}
+
+.feedback{margin-top:14px;border-radius:16px;padding:13px 15px;font-weight:800;line-height:1.5;display:none}
+.feedback.show{display:block;animation:pop .3s ease both}
+.feedback.good{background:var(--green-soft);border:2.5px solid #9BDCB4;color:#136B39}
+.feedback.bad{background:var(--red-soft);border:2.5px solid #F2B5C0;color:#9E2B41}
+.feedback strong{display:block;font-size:1.06rem;font-weight:900;margin-bottom:2px}
+@keyframes pop{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+
+.steps-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.steps-list li{
+  background:#FBF7EF;border:2.5px solid var(--line);border-radius:15px;padding:12px 14px;
+  font-weight:700;line-height:1.5;display:flex;gap:11px;align-items:flex-start;
+  animation:pop .3s ease both;
+}
+.steps-list li .num{
+  flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;
+  display:grid;place-items:center;font-weight:900;font-size:.85rem;
+}
+.steps-list li.final{background:var(--green-soft);border-color:#9BDCB4}
+.steps-list li.final .num{background:var(--green)}
+
+.toggles{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:2px dashed var(--line)}
+.toggle{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;font-weight:800;color:var(--ink-soft);cursor:pointer}
+.toggle input{width:18px;height:18px;accent-color:var(--blue);cursor:pointer}
+
+/* ---------- teaching cards (modal) ---------- */
+.overlay{
+  position:fixed;inset:0;background:rgba(40,28,10,.55);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;padding:18px;z-index:60;
+}
+.overlay.on{display:flex;animation:fadeIn .2s ease both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.teachcard{
+  background:var(--card);border-radius:26px;max-width:520px;width:100%;
+  box-shadow:0 20px 60px rgba(40,20,0,.4);padding:24px 24px 20px;
+  max-height:88vh;overflow:auto;animation:cardIn .3s cubic-bezier(.2,1.2,.4,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(.94)}to{opacity:1;transform:none}}
+.teachcard .cardemoji{font-size:2.6rem;line-height:1;display:block;margin-bottom:6px}
+.teachcard h3{margin:0 0 10px;font-size:1.45rem;font-weight:900;letter-spacing:-.02em}
+.teachcard p{margin:0 0 11px;line-height:1.6;font-weight:700;font-size:1.02rem}
+.teachcard .tip{
+  background:#FFF6DC;border:2.5px solid #F2DFA6;border-radius:14px;padding:11px 14px;
+  font-size:.95rem;line-height:1.5;margin:12px 0 4px;
+}
+.teachcard .tip b{color:#8A6300}
+.teachcard .dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px}
+.teachcard .dots i{width:9px;height:9px;border-radius:50%;background:#E0D8C8;display:block}
+.teachcard .dots i.on{background:var(--blue);transform:scale(1.25)}
+.cardfoot{display:flex;gap:10px;justify-content:space-between;align-items:center}
+.mini-clock{display:block;margin:6px auto 4px;width:170px;height:170px}
+
+/* ---------- celebration ---------- */
+.celebrate{text-align:center;padding:10px 0 4px}
+.celebrate .big{font-size:3.4rem;line-height:1;margin-bottom:6px}
+.celebrate h2{margin:0 0 6px;font-size:1.7rem;font-weight:900}
+.celebrate .starsbig{font-size:2.4rem;letter-spacing:6px;color:var(--gold);margin:6px 0 12px}
+.celebrate .starsbig .off{opacity:.22;filter:grayscale(1)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:80;display:none}
+#confetti.on{display:block}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.footnote{text-align:center;color:var(--ink-soft);font-size:.8rem;font-weight:700;margin-top:26px}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<div class="wrap">
+  <header class="topbar">
+    <div class="brand"><span class="logo">🕐</span><span>Clock Quest</span></div>
+    <div class="spacer"></div>
+    <div class="starcount" id="starCount" title="Stars you have earned">⭐ <span>0</span></div>
+    <button class="btn ghost small" id="btnHome" hidden>🏠 Map</button>
+    <button class="btn ghost small" id="btnHelp" hidden>❓ Help</button>
+  </header>
+
+  <!-- ============ HOME ============ -->
+  <section class="screen on" id="screenHome">
+    <div class="hero">
+      <h1>Learn to read a clock 🕓</h1>
+      <p>Twelve colored stripes show you the <b>hour</b>. The ring around the outside shows the <b>minutes</b>.
+         Work through the steps one at a time — you will read any clock by the end!</p>
+      <div class="btn-row" style="justify-content:center;margin-top:16px">
+        <button class="btn go" id="btnContinue">▶ Start learning</button>
+        <button class="btn ghost" id="btnFreePlay">🎨 Free play</button>
+        <button class="btn ghost" id="btnReset">↺ Start over</button>
+      </div>
+    </div>
+    <div class="lesson-grid" id="lessonGrid"></div>
+    <p class="footnote">Tip: you can drag the hands with a finger or the mouse, or use the arrow keys.</p>
+  </section>
+
+  <!-- ============ PLAY ============ -->
+  <section class="screen" id="screenPlay">
+    <div class="play">
+      <div class="clockbox">
+        <div class="clock-shell">
+          <svg class="clock" id="clockSvg" viewBox="0 0 420 420" role="img"
+               aria-label="Practice clock" tabindex="0"></svg>
+        </div>
+        <div class="readout" id="readout">
+          <div class="digital" id="digital">12:00</div>
+          <div class="inwords" id="inwords">twelve o'clock</div>
+        </div>
+        <div class="handpicker" id="handPicker">
+          <button class="chip" id="chipHour" aria-pressed="true"><span class="dot" style="background:#2F3A56"></span>Hour hand (short)</button>
+          <button class="chip" id="chipMin" aria-pressed="false"><span class="dot" style="background:#D6455C"></span>Minute hand (long)</button>
+        </div>
+        <div class="nudge" id="nudge">
+          <button class="btn ghost small" data-nudge="-1">◀ back</button>
+          <button class="btn ghost small" data-nudge="1">forward ▶</button>
+        </div>
+        <p class="hintline" id="hintline">Drag a hand, or pick a hand above and use ← → keys.</p>
+        <div class="toggles">
+          <label class="toggle"><input type="checkbox" id="tgColors" checked> Color stripes</label>
+          <label class="toggle"><input type="checkbox" id="tgMinNums"> Every minute number</label>
+          <label class="toggle"><input type="checkbox" id="tgRealClock"> Real-clock numbers</label>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="crumbs" id="crumbs"></div>
+        <div class="progress"><i id="progBar" style="width:0%"></i></div>
+        <div class="task" id="task"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="cardTitle">
+  <div class="teachcard" id="teachcard"></div>
+</div>
+
+<div class="sr-only" id="live" aria-live="polite"></div>
+
+<script>
+"use strict";
+
+/* =========================================================
+   1. Colors, geometry, and time helpers
+   ========================================================= */
+
+// One color per hour, walking smoothly around the color wheel.
+// index 0 = the 12 stripe, 1 = the 1 stripe, ... 11 = the 11 stripe.
+const HOURS = [12,1,2,3,4,5,6,7,8,9,10,11];
+const COLOR = {
+  12:{fill:"#FF9FB8", deep:"#C2436B", name:"pink"},
+   1:{fill:"#FF8A7A", deep:"#C7422F", name:"red"},
+   2:{fill:"#FFB259", deep:"#B96F12", name:"orange"},
+   3:{fill:"#FFE066", deep:"#A98A00", name:"yellow"},
+   4:{fill:"#C8E86A", deep:"#6E8F14", name:"lime"},
+   5:{fill:"#7FDA8E", deep:"#1E8F45", name:"green"},
+   6:{fill:"#5FD9C0", deep:"#0C8F7C", name:"mint"},
+   7:{fill:"#66CFEF", deep:"#0E7FA6", name:"sky blue"},
+   8:{fill:"#7FAEF5", deep:"#2F63B8", name:"blue"},
+   9:{fill:"#A6A0F0", deep:"#5A52C4", name:"indigo"},
+  10:{fill:"#C99BF0", deep:"#8B4CC0", name:"purple"},
+  11:{fill:"#F292DA", deep:"#B4399A", name:"magenta"}
+};
+
+const CX = 210, CY = 210;
+const R = { minOut:200, minIn:168, hourOut:160, hourIn:62, num:130, numEdge:143, minNum:184 };
+const SVGNS = "http://www.w3.org/2000/svg";
+
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const pad2 = n => String(n).padStart(2,"0");
+const norm360 = a => ((a % 360) + 360) % 360;
+
+// point on the dial: angle 0 = 12 o'clock, growing clockwise
+function pt(r, deg){
+  const rad = (deg - 90) * Math.PI / 180;
+  return [CX + r * Math.cos(rad), CY + r * Math.sin(rad)];
+}
+// a slice of a ring (donut sector) between two radii and two angles
+function ringPath(r1, r2, a1, a2){
+  const large = (a2 - a1) > 180 ? 1 : 0;
+  const [x1,y1] = pt(r2,a1), [x2,y2] = pt(r2,a2);
+  const [x3,y3] = pt(r1,a2), [x4,y4] = pt(r1,a1);
+  return `M ${x1} ${y1} A ${r2} ${r2} 0 ${large} 1 ${x2} ${y2}
+          L ${x3} ${y3} A ${r1} ${r1} 0 ${large} 0 ${x4} ${y4} Z`;
+}
+function el(tag, attrs, parent){
+  const n = document.createElementNS(SVGNS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+
+// which stripe does the hour hand sit in, for an angle in degrees?
+const hourFromAngle = a => ((Math.floor(norm360(a)/30) + 11) % 12) + 1;
+// the stripe that begins at 30*i degrees belongs to this hour
+const hourOfStripe   = i => (i === 0 ? 12 : i);
+const nextHour       = h => (h % 12) + 1;
+
+const ONES = ["zero","one","two","three","four","five","six","seven","eight","nine","ten",
+  "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen","twenty",
+  "twenty-one","twenty-two","twenty-three","twenty-four","twenty-five","twenty-six","twenty-seven",
+  "twenty-eight","twenty-nine","thirty"];
+
+function timeDigital(h, m){ return h + ":" + pad2(m); }
+
+// How a person would say the time out loud.
+function timeWords(h, m){
+  if (m === 0)  return ONES[h] + " o'clock";
+  if (m === 15) return "quarter past " + ONES[h];
+  if (m === 30) return "half past " + ONES[h];
+  if (m === 45) return "quarter to " + ONES[nextHour(h)];
+  const extra = (m % 5 === 0) ? "" : " minutes";
+  if (m < 30)  return ONES[m] + extra + " past " + ONES[h];
+  return ONES[60 - m] + extra + " to " + ONES[nextHour(h)];
+}
+
+/* =========================================================
+   2. Building the clock face
+   ========================================================= */
+
+const svg = document.getElementById("clockSvg");
+let gZones, gZoneLabels, gMinRing, gMinTicks, gMinLabels, gHourHand, gMinHand, hourTipDot;
+const zonePaths = [], zoneLabels = [], minBlocks = [], tinyMinLabels = [];
+
+function buildClock(){
+  svg.innerHTML = "";
+
+  const defs = el("defs", {}, svg);
+  const glow = el("filter", {id:"handShadow", x:"-30%", y:"-30%", width:"160%", height:"160%"}, defs);
+  el("feDropShadow", {dx:0, dy:2, stdDeviation:1.8, "flood-opacity":0.22}, glow);
+
+  el("circle", {cx:CX, cy:CY, r:R.minOut, fill:"#FFFDF8", stroke:"#E6DCCB", "stroke-width":3}, svg);
+
+  // --- outer minute ring: twelve 5-minute blocks, tinted to match the hour stripes
+  gMinRing = el("g", {id:"minuteRing"}, svg);
+  for (let i = 0; i < 12; i++){
+    const h = hourOfStripe(i);
+    const p = el("path", {
+      d: ringPath(R.minIn, R.minOut, i*30, i*30 + 30),
+      fill: COLOR[h].fill, "fill-opacity":0.3, stroke:"#fff", "stroke-width":1.2,
+      class:"minblock"
+    }, gMinRing);
+    minBlocks.push(p);
+  }
+
+  // --- one tick per minute, longer at every 5
+  gMinTicks = el("g", {}, gMinRing);
+  for (let m = 0; m < 60; m++){
+    const a = m * 6, major = (m % 5 === 0);
+    const [x1,y1] = pt(R.minIn, a);
+    const [x2,y2] = pt(major ? R.minOut : R.minIn + 9, a);
+    el("line", {x1,y1,x2,y2, class: "mintick" + (major ? " major" : "")}, gMinTicks);
+  }
+
+  // --- minute numbers 0,5,10 ... 55 sit exactly on their tick
+  gMinLabels = el("g", {}, gMinRing);
+  for (let m = 0; m < 60; m += 5){
+    const [x,y] = pt(R.minNum, m*6 + 3);   // nudged just inside its own block
+    el("text", {x, y, class:"minlabel"}, gMinLabels).textContent = m;
+  }
+  // --- the in-between minute numbers, hidden until the learner asks for them
+  const gTiny = el("g", {}, gMinRing);
+  for (let m = 0; m < 60; m++){
+    if (m % 5 === 0) continue;
+    const [x,y] = pt(R.minNum, m*6 + 3);
+    const t = el("text", {x, y, class:"minlabel tiny", opacity:0}, gTiny);
+    t.textContent = m;
+    tinyMinLabels.push(t);
+  }
+
+  // --- the twelve colored hour stripes
+  gZones = el("g", {id:"zones"}, svg);
+  for (let i = 0; i < 12; i++){
+    const h = hourOfStripe(i);
+    const p = el("path", {
+      d: ringPath(R.hourIn, R.hourOut, i*30, i*30 + 30),
+      fill: COLOR[h].fill, class:"zone"
+    }, gZones);
+    zonePaths.push(p);
+  }
+  el("circle", {cx:CX, cy:CY, r:R.hourIn, fill:"#FFFDF8", class:"face-ring"}, svg);
+
+  // --- the hour number written inside its own stripe
+  gZoneLabels = el("g", {}, svg);
+  for (let i = 0; i < 12; i++){
+    const t = el("text", {class:"zonelabel"}, gZoneLabels);
+    t.textContent = hourOfStripe(i);
+    zoneLabels.push(t);
+  }
+  placeZoneLabels(false);
+
+  // --- the hands (each one points straight up, then gets rotated)
+  gHourHand = el("g", {class:"hand", filter:"url(#handShadow)"}, svg);
+  el("path", {class:"hand-hour", d:`M ${CX} ${CY+24} L ${CX-11} ${CY} L ${CX-7} ${CY-88}
+      L ${CX} ${CY-104} L ${CX+7} ${CY-88} L ${CX+11} ${CY} Z`}, gHourHand);
+  // the tip is painted like the stripe the hand is in, so a hand sitting
+  // exactly on a dividing line still shows which hour it means
+  hourTipDot = el("circle", {cx:CX, cy:CY-96, r:9, stroke:"#fff", "stroke-width":2.5,
+                             fill:COLOR[12].deep, class:"tipdot"}, gHourHand);
+
+  gMinHand = el("g", {class:"hand", filter:"url(#handShadow)"}, svg);
+  el("path", {class:"hand-min", d:`M ${CX} ${CY+30} L ${CX-8} ${CY} L ${CX-4.5} ${CY-168}
+      L ${CX} ${CY-186} L ${CX+4.5} ${CY-168} L ${CX+8} ${CY} Z`}, gMinHand);
+
+  el("circle", {cx:CX, cy:CY, r:13, class:"hub"}, svg);
+  el("circle", {cx:CX, cy:CY, r:4.5, fill:"#FFFDF8"}, svg);
+}
+
+// Learning view puts the number in the middle of its stripe.
+// Real-clock view puts it where a normal clock prints it: on the line where the stripe starts.
+function placeZoneLabels(realClock){
+  for (let i = 0; i < 12; i++){
+    const a = realClock ? i*30 : i*30 + 15;
+    const r = realClock ? R.numEdge : R.num;
+    const [x,y] = pt(r, a);
+    zoneLabels[i].setAttribute("x", x);
+    zoneLabels[i].setAttribute("y", y);
+    zoneLabels[i].setAttribute("class", "zonelabel" + (realClock ? " small" : ""));
+  }
+}
+
+/* =========================================================
+   3. Clock state, drawing, and animation
+   ========================================================= */
+
+const clock = {
+  h: 12, m: 0,          // the time the clock is showing
+  showHour: 0,          // drawn angles (these tween towards the real ones)
+  showMin: 0,
+  minuteStep: 5,        // how far one nudge or drag-snap moves the minute hand
+  masked: false,        // true while the learner is being asked, so no free answers
+  interactive: true,
+  selected: "hour",
+  anim: null
+};
+
+const targetHourAngle = () => ((clock.h % 12) + clock.m / 60) * 30;
+const targetMinAngle  = () => clock.m * 6;
+
+function drawHands(){
+  gHourHand.setAttribute("transform", `rotate(${clock.showHour} ${CX} ${CY})`);
+  gMinHand .setAttribute("transform", `rotate(${clock.showMin}  ${CX} ${CY})`);
+}
+
+function refreshTipDot(){
+  if (!hourTipDot) return;
+  hourTipDot.setAttribute("fill", COLOR[clock.h].deep);
+  hourTipDot.setAttribute("opacity", view.colors ? 1 : 0);
+}
+
+function refreshReadout(){
+  refreshTipDot();
+  const d = document.getElementById("digital"), w = document.getElementById("inwords");
+  if (clock.masked){
+    // during a question the answer stays hidden, but the space keeps its shape
+    d.textContent = "?:??";
+    w.textContent = "…you tell me!";
+    svg.setAttribute("aria-label", "Practice clock, waiting for your answer");
+  } else {
+    d.textContent = timeDigital(clock.h, clock.m);
+    w.textContent = timeWords(clock.h, clock.m);
+    svg.setAttribute("aria-label", "Clock showing " + timeWords(clock.h, clock.m));
+  }
+}
+function revealReadout(){ clock.masked = false; refreshReadout(); }
+
+// Turn a hand the short way round, so 11:55 -> 12:00 does not spin backwards.
+function shortestDelta(from, to){
+  let d = (to - from) % 360;
+  if (d > 180) d -= 360;
+  if (d < -180) d += 360;
+  return d;
+}
+
+function setTime(h, m, opts){
+  opts = opts || {};
+  clock.h = ((h - 1 + 12) % 12) + 1;
+  clock.m = ((m % 60) + 60) % 60;
+  const th = targetHourAngle(), tm = targetMinAngle();
+
+  if (clock.anim) cancelAnimationFrame(clock.anim);
+
+  if (opts.animate){
+    const h0 = clock.showHour, m0 = clock.showMin;
+    const dh = shortestDelta(h0, th), dm = shortestDelta(m0, tm);
+    const dur = 620, t0 = performance.now();
+    const step = now => {
+      const k = clamp((now - t0) / dur, 0, 1);
+      const e = 1 - Math.pow(1 - k, 3);          // ease out
+      clock.showHour = h0 + dh * e;
+      clock.showMin  = m0 + dm * e;
+      drawHands();
+      if (k < 1) clock.anim = requestAnimationFrame(step); else clock.anim = null;
+    };
+    clock.anim = requestAnimationFrame(step);
+  } else {
+    clock.showHour = th;
+    clock.showMin  = tm;
+    drawHands();
+  }
+  refreshReadout();
+  if (opts.onChange !== false) onClockChanged();
+}
+
+let onClockChanged = () => {};
+
+/* =========================================================
+   4. Dragging, nudging, and keyboard control
+   ========================================================= */
+
+function svgPoint(evt){
+  const r = svg.getBoundingClientRect();
+  const scale = 420 / r.width;
+  return [(evt.clientX - r.left) * scale, (evt.clientY - r.top) * scale];
+}
+function angleAt(x, y){
+  return norm360(Math.atan2(x - CX, CY - y) * 180 / Math.PI);
+}
+
+function pickHand(x, y){
+  const [hx,hy] = pt(104, clock.showHour);      // hour hand tip
+  const [mx,my] = pt(180, clock.showMin);       // minute hand tip
+  const dh = Math.hypot(x-hx, y-hy), dm = Math.hypot(x-mx, y-my);
+  if (Math.min(dh, dm) < 95) return dh <= dm ? "hour" : "min";
+  return Math.hypot(x-CX, y-CY) > R.hourOut - 6 ? "min" : "hour";  // outer area = minutes
+}
+
+function moveSelectedTo(angle){
+  if (clock.selected === "min"){
+    const step = clock.minuteStep;
+    let m = Math.round(angle / (6 * step)) * step;
+    setTime(clock.h, ((m % 60) + 60) % 60);
+  } else {
+    setTime(hourFromAngle(angle), clock.m);      // the hand drops into that stripe
+  }
+}
+
+function selectHand(which){
+  clock.selected = which;
+  document.getElementById("chipHour").setAttribute("aria-pressed", which === "hour");
+  document.getElementById("chipMin") .setAttribute("aria-pressed", which === "min");
+  gHourHand.classList.toggle("sel", which === "hour");
+  gMinHand .classList.toggle("sel", which === "min");
+}
+
+let dragging = false;
+svg.addEventListener("pointerdown", e => {
+  if (!clock.interactive) return;
+  const [x,y] = svgPoint(e);
+  if (Math.hypot(x-CX, y-CY) > R.minOut) return;
+  selectHand(pickHand(x, y));
+  dragging = true;
+  svg.setPointerCapture(e.pointerId);
+  (clock.selected === "hour" ? gHourHand : gMinHand).classList.add("grabbing");
+  moveSelectedTo(angleAt(x, y));
+  e.preventDefault();
+});
+svg.addEventListener("pointermove", e => {
+  if (!dragging || !clock.interactive) return;
+  const [x,y] = svgPoint(e);
+  moveSelectedTo(angleAt(x, y));
+  e.preventDefault();
+});
+function endDrag(e){
+  if (!dragging) return;
+  dragging = false;
+  gHourHand.classList.remove("grabbing");
+  gMinHand.classList.remove("grabbing");
+  try { svg.releasePointerCapture(e.pointerId); } catch (_) {}
+}
+svg.addEventListener("pointerup", endDrag);
+svg.addEventListener("pointercancel", endDrag);
+
+function nudge(dir){
+  if (!clock.interactive) return;
+  if (clock.selected === "min") setTime(clock.h, clock.m + dir * clock.minuteStep);
+  else                          setTime(clock.h + dir, clock.m);
+}
+document.getElementById("nudge").addEventListener("click", e => {
+  const b = e.target.closest("[data-nudge]");
+  if (b) nudge(Number(b.dataset.nudge));
+});
+document.getElementById("chipHour").addEventListener("click", () => selectHand("hour"));
+document.getElementById("chipMin") .addEventListener("click", () => selectHand("min"));
+
+svg.addEventListener("keydown", e => {
+  if (!clock.interactive) return;
+  if (e.key === "ArrowRight" || e.key === "ArrowUp")   { nudge(1);  e.preventDefault(); }
+  if (e.key === "ArrowLeft"  || e.key === "ArrowDown") { nudge(-1); e.preventDefault(); }
+  if (e.key === "h" || e.key === "H") selectHand("hour");
+  if (e.key === "m" || e.key === "M") selectHand("min");
+});
+
+/* =========================================================
+   5. View options
+   ========================================================= */
+
+const view = { colors:true, minNums:false, realClock:false };
+
+function applyView(){
+  zonePaths.forEach(p => p.classList.toggle("dim", !view.colors));
+  minBlocks.forEach(p => p.setAttribute("fill-opacity", view.colors ? 0.3 : 0.06));
+  tinyMinLabels.forEach(t => t.setAttribute("opacity", view.minNums ? 1 : 0));
+  refreshTipDot();
+  placeZoneLabels(view.realClock);
+  document.getElementById("tgColors").checked    = view.colors;
+  document.getElementById("tgMinNums").checked   = view.minNums;
+  document.getElementById("tgRealClock").checked = view.realClock;
+}
+document.getElementById("tgColors").addEventListener("change", e => { view.colors = e.target.checked; applyView(); });
+document.getElementById("tgMinNums").addEventListener("change", e => { view.minNums = e.target.checked; applyView(); });
+document.getElementById("tgRealClock").addEventListener("change", e => { view.realClock = e.target.checked; applyView(); });
+
+function flashHourStripe(h){
+  const i = HOURS.indexOf(h);
+  if (i < 0) return;
+  const p = zonePaths[i];
+  p.classList.remove("flash"); void p.getBBox(); p.classList.add("flash");
+  setTimeout(() => p.classList.remove("flash"), 2300);
+}
+function flashMinuteRing(){
+  gMinRing.classList.remove("flash"); void gMinRing.getBBox(); gMinRing.classList.add("flash");
+  setTimeout(() => gMinRing.classList.remove("flash"), 2300);
+}
+
+/* =========================================================
+   6. The lessons
+   ========================================================= */
+
+const LESSONS = [
+  {
+    id:"meet", emoji:"👋", title:"Meet the Clock",
+    blurb:"The two hands, the colored stripes and the minute ring.",
+    minuteStep:5, choices:"oclock",
+    view:{colors:true, minNums:false, realClock:false},
+    cards:[
+      {emoji:"🕐", h:"A clock has two hands",
+       body:["The <b>short fat hand</b> is the <b>hour hand</b>. It tells you the hour.",
+             "The <b>long skinny hand</b> is the <b>minute hand</b>. It tells you the minutes."],
+       tip:"Remember: <b>short hand = short word (hour)</b>. Long hand = long word (minute)."},
+      {emoji:"🎨", h:"The twelve colored stripes",
+       body:["The circle is cut into 12 colored stripes, one for every hour.",
+             "The number written inside a stripe is that stripe's hour. The yellow stripe is the <b>3</b> stripe.",
+             "Wherever the <b>short hand</b> is standing, that stripe's number is the hour. That is the whole trick!"],
+       tip:"The short hand walks slowly through a whole stripe. All the time it is in the yellow stripe, the hour is <b>3</b>."},
+      {emoji:"🔵", h:"The ring around the outside",
+       body:["The ring on the outside counts the <b>minutes</b>, from 0 all the way to 59.",
+             "There are 60 minutes in one hour, so the ring is split into 12 blocks with <b>5 minutes</b> in each block.",
+             "The <b>long hand</b> points at the ring to show the minutes."],
+       tip:"Count the blocks by fives: <b>5, 10, 15, 20…</b> That is much faster than counting every tick."},
+      {emoji:"🐢", h:"A turtle and a rabbit",
+       body:["The hour hand is a slow <b>turtle</b> 🐢. It takes a whole hour to creep across just one stripe.",
+             "The minute hand is a speedy <b>rabbit</b> 🐰. It races all the way round the clock in one hour.",
+             "When the rabbit goes round once, the turtle moves on one stripe."]}
+    ],
+    explore:"Have a play! Drag the long red hand all the way around the clock and watch the short hand creep forward one stripe.",
+    examples:[], set:[], tell:[]
+  },
+
+  {
+    id:"oclock", emoji:"🥁", title:"O'clock",
+    blurb:"Times on the hour, when the long hand points at 12.",
+    minuteStep:5, choices:"oclock",
+    view:{colors:true, minNums:false, realClock:false},
+    cards:[
+      {emoji:"⬆️", h:"Straight up means o'clock",
+       body:["When the <b>long hand</b> points <b>straight up at the 12</b>, zero minutes have gone by.",
+             "We say <b>“o'clock”</b>. We write it as <b>:00</b>, like 3:00."]},
+      {emoji:"👉", h:"Then read the short hand",
+       body:["At o'clock the <b>short hand</b> sits right at the <b>start line</b> of a stripe — next to that stripe's number.",
+             "Read the number in that stripe and you are done: “5 o'clock”."],
+       tip:"Long hand on the 12 first, <b>then</b> read the stripe. Always in that order."}
+    ],
+    examples:[{h:3,m:0},{h:8,m:0}],
+    set:[{h:5,m:0},{h:11,m:0},{h:2,m:0}],
+    tell:[{h:7,m:0},{h:12,m:0},{h:4,m:0}]
+  },
+
+  {
+    id:"half", emoji:"🌗", title:"Half past",
+    blurb:"The long hand points straight down at the 6.",
+    minuteStep:5, choices:"half",
+    view:{colors:true, minNums:false, realClock:false},
+    cards:[
+      {emoji:"⬇️", h:"Half way round the clock",
+       body:["When the long hand has travelled <b>half way</b> around, it points <b>straight down at the 6</b>.",
+             "Half of 60 is <b>30</b>, so that is <b>30 minutes</b>. We say <b>“half past”</b>."]},
+      {emoji:"⚠️", h:"Watch out for the short hand!",
+       body:["At half past, the short hand is <b>in the middle of its stripe</b> — halfway between two numbers.",
+             "It looks like it is pointing between the 3 and the 4, and that fools a lot of people.",
+             "The hour is the stripe the hand is <b>inside</b>. Inside the yellow 3 stripe means the hour is still <b>3</b>."],
+       tip:"Half past 3 is <b>3:30</b>, never 4:30. The short hand has not reached the 4 stripe yet."}
+    ],
+    examples:[{h:3,m:30},{h:9,m:30}],
+    set:[{h:6,m:30},{h:1,m:30},{h:10,m:30}],
+    tell:[{h:2,m:30},{h:12,m:30},{h:5,m:30}]
+  },
+
+  {
+    id:"quarter", emoji:"🍕", title:"Quarter past & quarter to",
+    blurb:"The long hand at the 3 and at the 9.",
+    minuteStep:5, choices:"quarter",
+    view:{colors:true, minNums:false, realClock:false},
+    cards:[
+      {emoji:"🍕", h:"A quarter of the clock",
+       body:["Cut a pizza into 4 pieces and one piece is a <b>quarter</b>. Do the same to the clock.",
+             "One quarter round takes the long hand to the <b>3</b>. That is <b>15 minutes</b> — <b>“quarter past”</b>."]},
+      {emoji:"↩️", h:"Quarter to is nearly there",
+       body:["Three quarters round takes the long hand to the <b>9</b>. That is <b>45 minutes</b>.",
+             "There are only 15 minutes left before the next hour, so instead of “45 past” we say <b>“quarter to”</b> — and we use the <b>next</b> number.",
+             "The short hand is nearly at the end of the 3 stripe, so we say <b>quarter to 4</b>. On a digital clock it still says <b>3:45</b>."],
+       tip:"“<b>Past</b>” counts up from the hour you are in. “<b>To</b>” counts down to the hour that is coming."}
+    ],
+    examples:[{h:4,m:15},{h:7,m:45}],
+    set:[{h:2,m:15},{h:9,m:45},{h:6,m:15}],
+    tell:[{h:11,m:15},{h:3,m:45},{h:8,m:15}]
+  },
+
+  {
+    id:"fives", emoji:"🖐️", title:"Counting by fives",
+    blurb:"Every block on the ring is worth 5 minutes.",
+    minuteStep:5, choices:"five",
+    view:{colors:true, minNums:false, realClock:false},
+    cards:[
+      {emoji:"🖐️", h:"One block = five minutes",
+       body:["Put your finger on the <b>12</b> and hop forward one block at a time, saying <b>5, 10, 15, 20, 25, 30…</b>",
+             "Stop when you reach the long hand. The number you said is the minutes."],
+       tip:"The right hand side of the clock is <b>past</b>. The left hand side is <b>to</b>."},
+      {emoji:"🗣️", h:"Saying it out loud",
+       body:["<b>5:20</b> is “twenty past five”, because 20 minutes have gone <b>past</b> 5 o'clock.",
+             "<b>5:50</b> is “ten <b>to</b> six”, because there are only 10 minutes left until 6 o'clock.",
+             "Both are correct — digital clocks just always count up."]}
+    ],
+    examples:[{h:5,m:20},{h:10,m:50}],
+    set:[{h:3,m:25},{h:7,m:40},{h:12,m:10}],
+    tell:[{h:1,m:35},{h:6,m:55},{h:9,m:20}]
+  },
+
+  {
+    id:"minutes", emoji:"🔍", title:"Every single minute",
+    blurb:"Use the tiny ticks to read any minute at all.",
+    minuteStep:1, choices:"any",
+    view:{colors:true, minNums:false, realClock:false},
+    cards:[
+      {emoji:"🔍", h:"The tiny ticks",
+       body:["Between the big blocks there are <b>tiny ticks</b>. Each one is worth <b>1 minute</b>.",
+             "First count the big blocks by fives to get close, <b>then</b> count the tiny ticks one at a time."]},
+      {emoji:"🧮", h:"Try it: 2:37",
+       body:["Count the blocks: 5, 10, 15, 20, 25, 30, 35. Now count 2 more tiny ticks: 36, <b>37</b>.",
+             "The short hand is past the middle of the 2 stripe, so the hour is <b>2</b>. The time is <b>2:37</b>."],
+       tip:"Stuck? Switch on <b>“Every minute number”</b> under the clock while you practise."}
+    ],
+    examples:[{h:2,m:37},{h:8,m:8}],
+    set:[{h:4,m:13},{h:11,m:47},{h:6,m:22}],
+    tell:[{h:10,m:26},{h:5,m:52},{h:3,m:41}]
+  },
+
+  {
+    id:"champion", emoji:"🏆", title:"Clock Champion",
+    blurb:"No training colors — just like a real clock.",
+    minuteStep:1, choices:"any",
+    view:{colors:false, minNums:false, realClock:true},
+    cards:[
+      {emoji:"🕰️", h:"Real clocks have no colors",
+       body:["On a real clock the numbers are printed <b>on the start line of each stripe</b>, and the colors are gone.",
+             "So the number <b>3</b> sits where the yellow stripe began. Picture the stripe stretching forward from the 3 to the 4."],
+       tip:"Ask yourself: “which two numbers is the short hand <b>between</b>?” The answer is the <b>smaller</b> one."},
+      {emoji:"💪", h:"You already know how",
+       body:["1. Short hand — which number has it just gone past? That is the hour.",
+             "2. Long hand — count round by fives, then tiny ticks. That is the minutes.",
+             "You can switch the colors back on any time if you want a peek."]}
+    ],
+    examples:[{h:9,m:5}],
+    set:[{h:1,m:20},{h:7,m:35},{h:12,m:48}],
+    tell:[{h:4,m:9},{h:8,m:30},{h:2,m:55},{h:6,m:17}]
+  }
+];
+
+/* ----- worked-out explanations, built from the time itself ----- */
+function countByFives(m){
+  const blocks = Math.floor(m / 5);
+  const said = [];
+  for (let i = 1; i <= blocks; i++) said.push(i * 5);
+  return {blocks, said, rest: m % 5};
+}
+
+function explainSteps(h, m){
+  const c = COLOR[h];
+  const steps = [];
+
+  steps.push({focus:"hour", text:
+    `Look at the <b>short hand</b>. It is standing in the <b>${c.name}</b> stripe, and that stripe belongs to the <b>${h}</b>. ` +
+    `So the hour is <b>${h}</b>.`});
+
+  let minText;
+  if (m === 0){
+    minText = `Now the <b>long hand</b>. It points straight up at the <b>12</b>, so <b>0 minutes</b> have gone by. We say <b>o'clock</b>.`;
+  } else {
+    const {blocks, said, rest} = countByFives(m);
+    if (blocks === 0){
+      minText = `Now the <b>long hand</b>. It has not even reached the first block, so count the tiny ticks: ` +
+                `${Array.from({length:m},(_,i)=>i+1).join(", ")} → <b>${m} minutes</b>.`;
+    } else {
+      minText = `Now the <b>long hand</b>. Start at the 12 and count the blocks by fives: <b>${said.join(", ")}</b>.`;
+      if (rest) minText += ` Then count <b>${rest}</b> more tiny tick${rest > 1 ? "s" : ""} → <b>${m} minutes</b>.`;
+      else      minText += ` That is <b>${m} minutes</b>.`;
+    }
+  }
+  steps.push({focus:"min", text:minText});
+
+  steps.push({focus:"both", final:true, text:
+    `Put them together: <b>${timeDigital(h,m)}</b> — out loud we say <b>“${timeWords(h,m)}”</b>.`});
+  return steps;
+}
+
+/* =========================================================
+   7. Saved progress
+   ========================================================= */
+
+const SAVE_KEY = "clockquest.v1";
+let progress = {stars:{}};
+
+function loadProgress(){
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (raw) progress = JSON.parse(raw);
+  } catch (_) {}
+  if (!progress || typeof progress !== "object" || !progress.stars) progress = {stars:{}};
+}
+function saveProgress(){
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(progress)); } catch (_) {}
+}
+const isUnlocked  = i => i === 0 || progress.stars[LESSONS[i-1].id] > 0;
+const totalStars  = () => Object.values(progress.stars).reduce((a,b) => a + b, 0);
+function starsHTML(n){
+  let s = "";
+  for (let i = 1; i <= 3; i++) s += `<span class="${i <= n ? "" : "off"}">★</span>`;
+  return s;
+}
+
+/* =========================================================
+   8. Screens and the lesson flow
+   ========================================================= */
+
+const screens = {home:document.getElementById("screenHome"), play:document.getElementById("screenPlay")};
+const panelTask = document.getElementById("task");
+const crumbsEl  = document.getElementById("crumbs");
+const progBar   = document.getElementById("progBar");
+const overlay   = document.getElementById("overlay");
+const teachcard = document.getElementById("teachcard");
+const live      = document.getElementById("live");
+const btnHome   = document.getElementById("btnHome");
+const btnHelp   = document.getElementById("btnHelp");
+
+let flow = null;
+
+function showScreen(name){
+  for (const k in screens) screens[k].classList.toggle("on", k === name);
+  btnHome.hidden = (name !== "play");
+  btnHelp.hidden = (name !== "play");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+function say(msg){ live.textContent = msg; }
+
+const PHASE_LABEL = {cards:"Learn", explore:"Play", examples:"Watch", set:"Set the time", tell:"Read the clock", done:"Finish"};
+
+function phasesFor(L){
+  const p = [];
+  if (L.cards && L.cards.length) p.push("cards");
+  if (L.explore) p.push("explore");
+  if (L.examples && L.examples.length) p.push("examples");
+  if (L.set && L.set.length) p.push("set");
+  if (L.tell && L.tell.length) p.push("tell");
+  p.push("done");
+  return p;
+}
+function itemsIn(L, phase){
+  if (phase === "examples") return L.examples.length;
+  if (phase === "set") return L.set.length;
+  if (phase === "tell") return L.tell.length;
+  return 1;
+}
+
+function renderCrumbs(){
+  crumbsEl.innerHTML = "";
+  const here = flow.phases.indexOf(flow.phase);
+  flow.phases.forEach((p, i) => {
+    const s = document.createElement("span");
+    s.className = "crumb" + (i === here ? " on" : (i < here ? " done" : ""));
+    s.textContent = (i < here ? "✓ " : "") + PHASE_LABEL[p];
+    crumbsEl.appendChild(s);
+  });
+  let total = 0, done = 0;
+  flow.phases.forEach((p, i) => {
+    const w = itemsIn(flow.lesson, p);
+    total += w;
+    if (i < here) done += w;
+    else if (i === here) done += Math.min(flow.idx, w);
+  });
+  progBar.style.width = Math.round(done / total * 100) + "%";
+}
+
+function goPhase(phase){
+  flow.phase = phase;
+  flow.idx = 0;
+  flow.stepShown = 0;
+  flow.answer = {h:null, m:null};
+  flow.tries = 0;
+  if (phase === "cards") openCard(0);
+  renderTask();
+}
+function nextPhase(){
+  const i = flow.phases.indexOf(flow.phase);
+  goPhase(flow.phases[Math.min(i + 1, flow.phases.length - 1)]);
+}
+
+function startLesson(i){
+  const L = LESSONS[i];
+  flow = {li:i, lesson:L, phases:phasesFor(L), phase:null, idx:0, stepShown:0,
+          wrong:0, tries:0, answer:{h:null,m:null}};
+  Object.assign(view, L.view);
+  applyView();
+  clock.minuteStep = L.minuteStep;
+  clock.interactive = true;
+  onClockChanged = () => {
+    if (flow && flow.phase === "set"){
+      const fb = document.getElementById("fb");
+      if (fb) fb.classList.remove("show");
+    }
+  };
+  setTime(12, 0, {onChange:false});
+  selectHand("hour");
+  showScreen("play");
+  goPhase(flow.phases[0]);
+}
+
+/* ---------- teaching cards ---------- */
+function openCard(i){
+  const cards = flow.lesson.cards;
+  if (i >= cards.length){ closeCard(); nextPhase(); return; }
+  flow.cardIdx = i;
+  const c = cards[i];
+  if (c.show) setTime(c.show.h, c.show.m, {onChange:false});
+  teachcard.innerHTML = `
+    <span class="cardemoji">${c.emoji}</span>
+    <h3 id="cardTitle">${c.h}</h3>
+    ${c.body.map(t => `<p>${t}</p>`).join("")}
+    ${c.tip ? `<div class="tip">💡 <b>Tip:</b> ${c.tip}</div>` : ""}
+    <div class="dots">${cards.map((_,k) => `<i class="${k===i?"on":""}"></i>`).join("")}</div>
+    <div class="cardfoot">
+      <button class="btn ghost small" id="cardBack" ${i===0?"disabled":""}>← Back</button>
+      <button class="btn go" id="cardNext">${i === cards.length-1 ? "Got it! 👍" : "Next →"}</button>
+    </div>`;
+  overlay.classList.add("on");
+  document.getElementById("cardNext").addEventListener("click", () => openCard(i + 1));
+  document.getElementById("cardBack").addEventListener("click", () => openCard(i - 1));
+  document.getElementById("cardNext").focus();
+}
+function closeCard(){ overlay.classList.remove("on"); teachcard.innerHTML = ""; }
+overlay.addEventListener("click", e => { if (e.target === overlay) closeCard(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeCard(); });
+btnHelp.addEventListener("click", () => { if (flow && flow.lesson.cards.length) openCard(0); });
+
+/* ---------- clock visibility helpers ---------- */
+function setClockMode(o){
+  clock.interactive = !!o.interactive;
+  clock.masked = !o.readout;
+  refreshReadout();
+  document.getElementById("handPicker").style.display = o.interactive ? "" : "none";
+  document.getElementById("nudge").style.display = o.interactive ? "" : "none";
+  document.getElementById("hintline").style.display = o.interactive ? "" : "none";
+  svg.style.cursor = o.interactive ? "pointer" : "default";
+}
+
+/* ---------- the task panel ---------- */
+function renderTask(){
+  renderCrumbs();
+  const L = flow.lesson;
+  const P = flow.phase;
+
+  if (P === "cards"){
+    setClockMode({interactive:true, readout:true});
+    panelTask.innerHTML = `
+      <h2>${L.emoji} ${L.title}</h2>
+      <p class="sub">Read the cards, then come back here.</p>
+      <div class="btn-row">
+        <button class="btn" id="openCards">📖 Open the cards</button>
+        <button class="btn go" id="skipCards">I've read them →</button>
+      </div>`;
+    document.getElementById("openCards").onclick = () => openCard(0);
+    document.getElementById("skipCards").onclick = () => { closeCard(); nextPhase(); };
+    return;
+  }
+
+  if (P === "explore"){
+    setClockMode({interactive:true, readout:true});
+    panelTask.innerHTML = `
+      <h2>🎮 Your turn to play</h2>
+      <p class="sub">${L.explore}</p>
+      <ul class="steps-list">
+        <li><span class="num">1</span><span>Drag a hand with your finger or mouse. The clock underneath tells you the time in numbers and in words.</span></li>
+        <li><span class="num">2</span><span>Try putting the <b>short</b> hand in different colored stripes.</span></li>
+        <li><span class="num">3</span><span>Send the <b>long</b> hand right around and watch the short hand creep to the next stripe.</span></li>
+      </ul>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn go" id="doneExplore">I'm ready →</button>
+      </div>`;
+    document.getElementById("doneExplore").onclick = nextPhase;
+    return;
+  }
+
+  if (P === "examples"){
+    const ex = L.examples[flow.idx];
+    const steps = explainSteps(ex.h, ex.m);
+    setClockMode({interactive:false, readout:false});
+    setTime(ex.h, ex.m, {animate:true, onChange:false});
+
+    const shown = steps.slice(0, flow.stepShown);
+    panelTask.innerHTML = `
+      <h2>👀 Watch first — example ${flow.idx + 1} of ${L.examples.length}</h2>
+      <p class="sub">Let's read this clock together, one step at a time.</p>
+      <ul class="steps-list">
+        ${shown.map((s,i) => `<li class="${s.final?"final":""}"><span class="num">${i+1}</span><span>${s.text}</span></li>`).join("")}
+      </ul>
+      <div class="btn-row" style="margin-top:16px">
+        ${flow.stepShown < steps.length
+          ? `<button class="btn" id="nextStep">${flow.stepShown === 0 ? "Show me step 1 →" : "Next step →"}</button>`
+          : `<button class="btn go" id="nextEx">${flow.idx + 1 < L.examples.length ? "Next example →" : "Now you try →"}</button>`}
+      </div>`;
+
+    if (flow.stepShown < steps.length){
+      document.getElementById("nextStep").onclick = () => {
+        const s = steps[flow.stepShown];
+        if (s.focus === "hour") flashHourStripe(ex.h);
+        if (s.focus === "min")  flashMinuteRing();
+        if (s.focus === "both") revealReadout();
+        flow.stepShown++;
+        renderTask();
+        say(steps[flow.stepShown - 1].text.replace(/<[^>]+>/g, ""));
+      };
+    } else {
+      document.getElementById("nextEx").onclick = () => {
+        if (flow.idx + 1 < L.examples.length){ flow.idx++; flow.stepShown = 0; renderTask(); }
+        else nextPhase();
+      };
+    }
+    return;
+  }
+
+  if (P === "set")  return renderSetTask();
+  if (P === "tell") return renderTellTask();
+  if (P === "done") return renderDone();
+}
+
+/* ---------- "set the clock to…" ---------- */
+function renderSetTask(){
+  const L = flow.lesson, t = L.set[flow.idx];
+  setClockMode({interactive:true, readout:false});
+  if (flow.tries === 0 && !flow.keepHands) setTime(12, 0, {animate:true, onChange:false});
+  flow.keepHands = false;
+
+  panelTask.innerHTML = `
+    <h2>🔧 Set the clock — ${flow.idx + 1} of ${L.set.length}</h2>
+    <p class="sub">Drag the hands until the clock shows this time.</p>
+    <div class="bigtime">${timeDigital(t.h, t.m)}<span class="words">“${timeWords(t.h, t.m)}”</span></div>
+    <ul class="steps-list" style="margin-top:12px">
+      <li><span class="num">1</span><span>Put the <b>long</b> hand on the <b>${t.m}</b> minute mark.</span></li>
+      <li><span class="num">2</span><span>Put the <b>short</b> hand inside the <b>${COLOR[t.h].name} ${t.h}</b> stripe.</span></li>
+    </ul>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn go" id="checkSet">✓ Check my clock</button>
+    </div>
+    <div class="feedback" id="fb"></div>`;
+  document.getElementById("checkSet").onclick = checkSet;
+}
+
+function checkSet(){
+  const L = flow.lesson, t = L.set[flow.idx];
+  const okH = clock.h === t.h, okM = clock.m === t.m;
+  const fb = document.getElementById("fb");
+
+  if (okH && okM){
+    revealReadout();
+    fb.className = "feedback good show";
+    fb.innerHTML = `<strong>${praise()} 🎉</strong> That is <b>${timeDigital(t.h,t.m)}</b> — “${timeWords(t.h,t.m)}”.
+      <div class="btn-row" style="margin-top:10px"><button class="btn go small" id="nextSet">Next →</button></div>`;
+    say("Correct. " + timeWords(t.h, t.m));
+    burst();
+    document.getElementById("nextSet").onclick = () => {
+      if (flow.idx + 1 < L.set.length){ flow.idx++; flow.tries = 0; flow.keepHands = false; renderTask(); }
+      else { flow.idx = L.set.length; renderCrumbs(); nextPhase(); }
+    };
+    document.getElementById("checkSet").disabled = true;
+    return;
+  }
+
+  flow.tries++; flow.wrong++;
+  const bits = [];
+  if (!okH) bits.push(`Your short hand is in the <b>${COLOR[clock.h].name} ${clock.h}</b> stripe, but we want the <b>${COLOR[t.h].name} ${t.h}</b> stripe.`);
+  if (!okM) bits.push(`Your long hand is showing <b>${clock.m}</b> minutes, but we want <b>${t.m}</b>. Count round from the 12 by fives.`);
+  fb.className = "feedback bad show";
+  fb.innerHTML = `<strong>Not yet — have another go 🙂</strong> ${bits.join(" ")}`;
+  say("Not yet. Try again.");
+  if (!okH) flashHourStripe(t.h);
+  if (!okM) flashMinuteRing();
+  flow.keepHands = true;
+}
+
+/* ---------- "what time is it?" ---------- */
+function minuteChoices(kind){
+  if (kind === "oclock")  return [0];
+  if (kind === "half")    return [0,30];
+  if (kind === "quarter") return [0,15,30,45];
+  if (kind === "five")    return [0,5,10,15,20,25,30,35,40,45,50,55];
+  return null;                                   // "any" uses the spinner
+}
+function minuteCaption(m){
+  if (m === 0)  return "o'clock";
+  if (m === 15) return "quarter past";
+  if (m === 30) return "half past";
+  if (m === 45) return "quarter to";
+  return m < 30 ? m + " past" : (60 - m) + " to";
+}
+
+function renderTellTask(){
+  const L = flow.lesson, t = L.tell[flow.idx];
+  setClockMode({interactive:false, readout:false});
+  setTime(t.h, t.m, {animate:true, onChange:false});
+
+  const choices = minuteChoices(L.choices);
+  const a = flow.answer;
+
+  const minuteUI = choices
+    ? `<div class="mingrid">${choices.map(m => `
+        <button class="opt" data-min="${m}" aria-pressed="${a.m === m}">:${pad2(m)}<small>${minuteCaption(m)}</small></button>`).join("")}</div>`
+    : `<div class="spinner">
+         <button class="btn ghost small" data-mstep="-5">−5</button>
+         <button class="btn ghost small" data-mstep="-1">−1</button>
+         <div class="val" id="minVal">:${pad2(a.m === null ? 0 : a.m)}</div>
+         <button class="btn ghost small" data-mstep="1">+1</button>
+         <button class="btn ghost small" data-mstep="5">+5</button>
+       </div>`;
+
+  panelTask.innerHTML = `
+    <h2>🤔 What time is it? — ${flow.idx + 1} of ${L.tell.length}</h2>
+    <p class="sub">Read the clock, then pick your answer.</p>
+    <div class="answer-block">
+      <h4>The hour (look at the short hand)</h4>
+      <div class="hourgrid">${HOURS.slice().sort((x,y)=>x-y).map(h => `
+        <button class="opt hz" data-hour="${h}" aria-pressed="${a.h === h}"
+          style="border-color:${COLOR[h].deep};background:${a.h===h?COLOR[h].deep:COLOR[h].fill};color:${a.h===h?"#fff":"#33303C"}">${h}</button>`).join("")}</div>
+      <h4>The minutes (look at the long hand)</h4>
+      ${minuteUI}
+    </div>
+    <div class="btn-row" style="margin-top:18px">
+      <button class="btn go" id="checkTell">✓ Check my answer</button>
+      ${flow.tries > 0 ? `<button class="btn ghost" id="showHow">🧑‍🏫 Show me how</button>` : ""}
+    </div>
+    <div class="feedback" id="fb"></div>`;
+
+  panelTask.querySelectorAll("[data-hour]").forEach(b => b.onclick = () => {
+    flow.answer.h = Number(b.dataset.hour); renderTellTask();
+  });
+  panelTask.querySelectorAll("[data-min]").forEach(b => b.onclick = () => {
+    flow.answer.m = Number(b.dataset.min); renderTellTask();
+  });
+  panelTask.querySelectorAll("[data-mstep]").forEach(b => b.onclick = () => {
+    const cur = flow.answer.m === null ? 0 : flow.answer.m;
+    flow.answer.m = ((cur + Number(b.dataset.mstep)) % 60 + 60) % 60;
+    document.getElementById("minVal").textContent = ":" + pad2(flow.answer.m);
+  });
+  if (!choices && flow.answer.m === null) flow.answer.m = 0;
+
+  document.getElementById("checkTell").onclick = checkTell;
+  const sh = document.getElementById("showHow");
+  if (sh) sh.onclick = () => showHowTo(t);
+}
+
+function showHowTo(t){
+  const steps = explainSteps(t.h, t.m);
+  const fb = document.getElementById("fb");
+  fb.className = "feedback good show";
+  fb.innerHTML = `<strong>Let's work it out together 🧑‍🏫</strong>
+    <ul class="steps-list" style="margin-top:10px">
+      ${steps.slice(0,2).map((s,i) => `<li><span class="num">${i+1}</span><span>${s.text}</span></li>`).join("")}
+    </ul>`;
+  flashHourStripe(t.h);
+  setTimeout(flashMinuteRing, 400);
+}
+
+function checkTell(){
+  const L = flow.lesson, t = L.tell[flow.idx];
+  const a = flow.answer;
+  const fb = document.getElementById("fb");
+
+  if (a.h === null || a.m === null){
+    fb.className = "feedback bad show";
+    fb.innerHTML = `<strong>Almost!</strong> Pick both an hour <b>and</b> the minutes first.`;
+    return;
+  }
+  const okH = a.h === t.h, okM = a.m === t.m;
+
+  if (okH && okM){
+    revealReadout();
+    fb.className = "feedback good show";
+    fb.innerHTML = `<strong>${praise()} 🎉</strong> It is <b>${timeDigital(t.h,t.m)}</b> — “${timeWords(t.h,t.m)}”.
+      <div class="btn-row" style="margin-top:10px"><button class="btn go small" id="nextTell">Next →</button></div>`;
+    say("Correct. " + timeWords(t.h, t.m));
+    burst();
+    document.getElementById("checkTell").disabled = true;
+    document.getElementById("nextTell").onclick = () => {
+      if (flow.idx + 1 < L.tell.length){ flow.idx++; flow.tries = 0; flow.answer = {h:null,m:null}; renderTask(); }
+      else { flow.idx = L.tell.length; renderCrumbs(); nextPhase(); }
+    };
+    return;
+  }
+
+  flow.tries++; flow.wrong++;
+  const bits = [];
+  if (!okH) bits.push(`Check the <b>short</b> hand again — which colored stripe is it <b>inside</b>? That stripe's number is the hour.`);
+  if (!okM) bits.push(`Check the <b>long</b> hand — start at the 12 and count the blocks by fives.`);
+  fb.className = "feedback bad show";
+  fb.innerHTML = `<strong>Not quite — try once more 🙂</strong> ${bits.join(" ")}`;
+  say("Not quite. Try again.");
+  if (!okH) flashHourStripe(t.h);
+  if (!okM) flashMinuteRing();
+  const row = panelTask.querySelector(".btn-row");
+  if (!document.getElementById("showHow")){
+    const b = document.createElement("button");
+    b.className = "btn ghost"; b.id = "showHow"; b.textContent = "🧑‍🏫 Show me how";
+    b.onclick = () => showHowTo(t);
+    row.appendChild(b);
+  }
+}
+
+const PRAISE = ["Yes!","Perfect!","Spot on!","Nailed it!","Brilliant!","That's it!","Well done!"];
+const praise = () => PRAISE[Math.floor(Math.random() * PRAISE.length)];
+
+/* ---------- finished a lesson ---------- */
+function renderDone(){
+  const L = flow.lesson;
+  const stars = flow.wrong === 0 ? 3 : (flow.wrong <= 2 ? 2 : 1);
+  progress.stars[L.id] = Math.max(progress.stars[L.id] || 0, stars);
+  saveProgress();
+  updateStarCount();
+
+  setClockMode({interactive:true, readout:true});
+  const more = LESSONS[flow.li + 1];
+  panelTask.innerHTML = `
+    <div class="celebrate">
+      <div class="big">🎉</div>
+      <h2>${L.title} — complete!</h2>
+      <div class="starsbig">${starsHTML(stars)}</div>
+      <p class="sub">${flow.wrong === 0 ? "Every single answer right first time. Amazing!"
+        : "You got there — that is exactly how learning works."}</p>
+      <div class="btn-row" style="justify-content:center">
+        ${more ? `<button class="btn go" id="nextLesson">Next: ${more.emoji} ${more.title} →</button>` : ""}
+        <button class="btn ghost" id="backMap">🏠 Back to the map</button>
+      </div>
+    </div>`;
+  const nl = document.getElementById("nextLesson");
+  if (nl) nl.onclick = () => startLesson(flow.li + 1);
+  document.getElementById("backMap").onclick = goHome;
+  burst(true);
+  say(L.title + " complete. " + stars + " stars.");
+}
+
+/* =========================================================
+   9. Home map and free play
+   ========================================================= */
+
+const lessonGrid = document.getElementById("lessonGrid");
+
+function renderHome(){
+  lessonGrid.innerHTML = "";
+  LESSONS.forEach((L, i) => {
+    const open = isUnlocked(i);
+    const st = progress.stars[L.id] || 0;
+    const b = document.createElement("button");
+    b.className = "lesson-card" + (open ? "" : " locked");
+    b.disabled = !open;
+    b.innerHTML = `
+      <span class="step-no">${i + 1}</span>
+      <span class="lemoji">${open ? L.emoji : "🔒"}</span>
+      <span>
+        <h3>${L.title}</h3>
+        <p>${open ? L.blurb : "Finish step " + i + " to unlock this."}</p>
+        ${open ? `<div class="stars">${starsHTML(st)}</div>` : ""}
+      </span>`;
+    if (open) b.onclick = () => startLesson(i);
+    lessonGrid.appendChild(b);
+  });
+  updateStarCount();
+}
+function updateStarCount(){
+  document.getElementById("starCount").querySelector("span").textContent = totalStars();
+}
+function goHome(){ showScreen("home"); renderHome(); }
+btnHome.addEventListener("click", goHome);
+
+document.getElementById("btnContinue").addEventListener("click", () => {
+  let i = 0;
+  while (i < LESSONS.length - 1 && progress.stars[LESSONS[i].id] > 0) i++;
+  startLesson(i);
+});
+document.getElementById("btnReset").addEventListener("click", () => {
+  if (!confirm("Clear all stars and start from the beginning?")) return;
+  progress = {stars:{}};
+  saveProgress();
+  renderHome();
+});
+
+/* ---------- free play ---------- */
+function startFreePlay(){
+  flow = {li:-1, lesson:{emoji:"🎨", title:"Free play", cards:[], set:[], tell:[], examples:[]},
+          phases:["explore"], phase:"explore", idx:0, stepShown:0, wrong:0, tries:0, answer:{h:null,m:null}};
+  Object.assign(view, {colors:true, minNums:false, realClock:false});
+  applyView();
+  clock.minuteStep = 1;
+  setClockMode({interactive:true, readout:true});
+  setTime(10, 10, {animate:true, onChange:false});
+  selectHand("min");
+  showScreen("play");
+  crumbsEl.innerHTML = `<span class="crumb on">Free play</span>`;
+  progBar.style.width = "100%";
+  drawFreePlay();
+  onClockChanged = drawFreePlay;
+}
+function drawFreePlay(){
+  const box = document.getElementById("freeReadback");
+  const html = `
+      <h2>🎨 Free play</h2>
+      <p class="sub">Move the hands anywhere you like. The clock is read out for you below.</p>
+      <ul class="steps-list" id="freeSteps"></ul>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn warm" id="surprise">🎲 Surprise me</button>
+        <button class="btn ghost" id="nowBtn">⌚ Time right now</button>
+      </div>`;
+  if (!box) panelTask.innerHTML = `<div id="freeReadback">${html}</div>`;
+  const steps = explainSteps(clock.h, clock.m);
+  document.getElementById("freeSteps").innerHTML =
+    steps.map((s,i) => `<li class="${s.final?"final":""}"><span class="num">${i+1}</span><span>${s.text}</span></li>`).join("");
+  const sp = document.getElementById("surprise");
+  if (sp) sp.onclick = () => setTime(1 + Math.floor(Math.random()*12), Math.floor(Math.random()*60), {animate:true});
+  const nb = document.getElementById("nowBtn");
+  if (nb) nb.onclick = () => {
+    const d = new Date();
+    setTime(((d.getHours() + 11) % 12) + 1, d.getMinutes(), {animate:true});
+  };
+}
+document.getElementById("btnFreePlay").addEventListener("click", startFreePlay);
+
+/* =========================================================
+   10. Confetti
+   ========================================================= */
+
+const cvs = document.getElementById("confetti");
+const ctx = cvs.getContext("2d");
+let bits = [], raf = null;
+
+function burst(big){
+  const n = big ? 150 : 60;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cvs.width = innerWidth * dpr; cvs.height = innerHeight * dpr;
+  cvs.style.width = innerWidth + "px"; cvs.style.height = innerHeight + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const palette = Object.values(COLOR).map(c => c.fill);
+  for (let i = 0; i < n; i++){
+    bits.push({
+      x: innerWidth * (0.2 + Math.random() * 0.6),
+      y: innerHeight * 0.32 + Math.random() * 40,
+      vx: (Math.random() - 0.5) * 8,
+      vy: -6 - Math.random() * 8,
+      w: 6 + Math.random() * 7, h: 8 + Math.random() * 9,
+      rot: Math.random() * Math.PI, vr: (Math.random() - 0.5) * 0.4,
+      c: palette[Math.floor(Math.random() * palette.length)],
+      life: 90 + Math.random() * 50
+    });
+  }
+  cvs.classList.add("on");
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick(){
+  ctx.clearRect(0, 0, cvs.width, cvs.height);
+  bits = bits.filter(b => b.life > 0 && b.y < innerHeight + 60);
+  bits.forEach(b => {
+    b.life--; b.vy += 0.34; b.x += b.vx; b.y += b.vy; b.rot += b.vr; b.vx *= 0.99;
+    ctx.save();
+    ctx.translate(b.x, b.y); ctx.rotate(b.rot);
+    ctx.fillStyle = b.c; ctx.globalAlpha = Math.min(1, b.life / 35);
+    ctx.fillRect(-b.w/2, -b.h/2, b.w, b.h);
+    ctx.restore();
+  });
+  if (bits.length){ raf = requestAnimationFrame(tick); }
+  else { raf = null; cvs.classList.remove("on"); ctx.clearRect(0,0,cvs.width,cvs.height); }
+}
+
+/* =========================================================
+   11. Go!
+   ========================================================= */
+
+buildClock();
+applyView();
+selectHand("hour");
+setTime(10, 10, {onChange:false});
+loadProgress();
+renderHome();
+</script>
+</body>
+</html>
